@@ -1,31 +1,49 @@
 <template>
-  <b-container fluid="lg">
+  <div>
     <h1>Editor Gallery</h1>
-    <b-row>
-      <b-col>
-        <EditorGalleryImage class="b-col" :source="img"></EditorGalleryImage>
+
+    <b-row align-h="center" align-v="center">
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
       </b-col>
-      <b-col>
-        <EditorGalleryImage class="b-col" :source="img"></EditorGalleryImage>
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
       </b-col>
-      <b-col>
-        <EditorGalleryImage class="b-col" :source="img"></EditorGalleryImage>
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
       </b-col>
     </b-row>
-  </b-container>
+
+    <b-row align-h="center" align-v="center">
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
+      </b-col>
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
+      </b-col>
+      <b-col md="4">
+        <EditorGalleryImage :src="src" ></EditorGalleryImage>
+      </b-col>
+    </b-row>
+
+  </div>
 </template>
 
 <script>
-import EditorGalleryImage from "@/components/EditorGalleryImage.vue";
+//import EditorGalleryImage from "@/components/EditorGalleryImage.vue";
 import * as ls from '@/assets/js/loremPicsum.js'
-
+//import AsyncImage from "@/components/AsyncImage";
+import EditorGalleryImage from "@/components/EditorGalleryImage.vue" //Dynamic import of EditorGalleryImage
 export default {
   name: "EditorGallery",
-  components: {EditorGalleryImage},
-  mixins: [ls],
+  components: {
+    EditorGalleryImage
+
+  },
   data: () => {
     return{
-      img: ls.getImage(300,300)
+      //img: "" //ls.getImage(window.innerWidth) // Get Images based on viewport width and height
+      src: ls.getImage(600,500)
     }
   }
 }
@@ -33,5 +51,20 @@ export default {
 </script>
 
 <style scoped>
+.row{
+  text-align: center;
+  margin: 1em 0
+}
+
+@media(max-width: 768px){
+  .col-md-4{
+    margin: 0.5em 0;
+    /*flex: 0 0 33.333333%;*/
+    /*max-width: 33.333%;*/
+  }
+}
+
+
+
 
 </style>

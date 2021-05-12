@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid="lg" class="editor">
+  <b-container class="editor">
     <h1>Editor</h1>
     <EditorGallery></EditorGallery>
   </b-container>
@@ -14,5 +14,7 @@ export default {
 </script>
 
 <style scoped>
-
+.editor{
+  color: #0091AD;
+}
 </style>

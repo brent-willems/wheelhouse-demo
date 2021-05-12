@@ -17,7 +17,7 @@ const DEFAULT_HEIGHT = 300;
  * @param seed any kind of value used by the API to request a static image
  * @param modifiers MUST BE AN ARRAY, containing either or 'grayscale', 'blur' or both
  *
- * @return String containing the resolved URL of the Lorem Picsum API
+ * @return String containing the request URL of the Lorem Picsum API
  */
 
 export function getImage(width, height, seed, modifiers) {
@@ -44,21 +44,26 @@ export function getImage(width, height, seed, modifiers) {
         })
     }
 
+    return url
 
-    let resUrl = ""
+
+    // DEPRECATED:
+    //  Async HTTP GET functionality moved to EditorGalleryImage itself
+
+    // let resUrl = ""
 
     // HTTP Get request to fetch image with the desired parameters
     // XHTTP based:
     //  Synchronous atm for ease of development
     //  TODO: Make async, provide function with callback to fetch resolved URL upon http GET completion
-    let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            resUrl = this.responseURL
-        }
-    };
-    xhttp.open("GET", url, false);
-    xhttp.send();
+    // let xhttp = new XMLHttpRequest();
+    // xhttp.onreadystatechange = function () {
+    //     if (this.readyState === 4 && this.status === 200) {
+    //         resUrl = this.responseURL
+    //     }
+    // };
+    // xhttp.open("GET", url, false);
+    // xhttp.send();
 
 
     // Axios based HTTP
@@ -71,10 +76,10 @@ export function getImage(width, height, seed, modifiers) {
     //     })
     //
     // console.log(resUrl)
-
+    //
     // return resUrl;
 
     // DEV: Display the completed URL
-    console.log(xhttp.responseURL)
-    return resUrl;
+    //console.log(xhttp.responseURL)
+    //return resUrl;
 }
