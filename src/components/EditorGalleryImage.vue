@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <b-col md="4">
     <div v-if="!resUrl" class="d-flex justify-content-center align-items-center text-center h-100">
       <b-spinner type="grow" label="Loading..."></b-spinner>
     </div>
 
     <img :class="{'selectedImg': isSelected}" v-if="resUrl" v-on:click="onClickImage" ref="image" :src="resUrl" @load="loaded" alt="" :style="style"/>
-  </div>
+  </b-col>
 </template>
 
 <script>
