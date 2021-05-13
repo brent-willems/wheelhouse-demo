@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div v-if="!blobUrl" class="d-flex justify-content-center align-items-center text-center h-100">
+    <div v-if="!resUrl" class="d-flex justify-content-center align-items-center text-center h-100">
       <b-spinner type="grow" label="Loading..."></b-spinner>
     </div>
 
-    <img v-if="blobUrl" ref="image" :src="blobUrl" @load="loaded" alt="" :style="style"/>
+    <img :class="{'selectedImg': isSelected}" v-if="resUrl" v-on:click="onClickImage" ref="image" :src="resUrl" @load="loaded" alt="" :style="style"/>
   </div>
 </template>
 
@@ -15,51 +15,61 @@
 
 import axios from "axios"
 /**
- * Load an image url as a blob
+ * Load image url from LoremPicsum
  */
 async function load(src) {
   const config = { url: src, method: "get", responseType: "blob" }
   const response = await axios.request(config)
-  return response.data // the blob
+  //return response.data // the blob
+  return response.request.responseURL; // get the ResponseUrl
 }
 /**
- * Loads the image as a blob and createObjectURL().
- * Set the img tag's src to the object url.
- * Once the image is loaded, revoke the object url (avoid memory leak).
- * Notice that the page can still show the image, but the src blob is no longer valid.
+ * Loads the image dynamically (asynchronously)
+ * Set the img tag's src to the response url.
  */
 export default {
-  name: "AsyncImage",
-  data() {
-    return {
-      resUrl: "",
-      blobUrl: null,
-      style: ""
-    }
-  },
+  name: "EditorGalleryImage",
   props: {
-    spinnerW: {
-      type: Number
-    },
-    spinnerH:{
-      type: Number
+    selectedImage: {
+      type: String
     },
     src: {
       type: String,
     },
   },
+  data() {
+    return {
+      resUrl: "",
+      style: "",
+    }
+  },
+  computed: {
+    isSelected(){
+      return this.selectedImage === this.resUrl  // Image is considered selected when its own url matches the 'selectedImgUrl' passed down from the EditorGallery component
+    }
+  },
   methods: {
-    loaded() {
-      if (this.blobUrl) URL.revokeObjectURL(this.blobUrl)
+    onClickImage(){
+      this.$emit('select', this.resUrl)
     },
+    loaded() {
+      // this.onClickImage = function(){
+      //   this.$emit('clicked', this.resUrl)
+      // }
+    },
+
   },
   watch: {
     src: {
       immediate: true,
       handler(src) {
         if (!src) return
-        load(src).then(blob => {
-         this.blobUrl = URL.createObjectURL(blob)
+        // load(src).then(blob => {
+        //  this.blobUrl = URL.createObjectURL(blob)
+        // })
+        load(src).then(result => {
+          //console.log("Responseurl = " + result)
+          this.resUrl = result; // pass ResultUrl to image src attribute
         })
       },
     },
@@ -76,5 +86,11 @@ img{
 .spinner-grow{
   color: #0091AD;
 }
+
+.selectedImg{
+  border: 4px solid #0091AD;
+  transition: border ease-in 100ms;
+}
+
 
 </style>
