@@ -7,9 +7,19 @@
     <div>
       <h1>Editor Gallery</h1>
       <b-row>
-        <EditorGalleryImage  :key="url" v-for="url in sources" :src="url" :selected-image="selectedImageSrc" @select="selectImage"></EditorGalleryImage>
+        <EditorGalleryImage  class="editor-gallery-image" :key="source.id" v-for="source in sources" :src="source.url" :selected-image="selectedImageSrc" @select="selectImage"></EditorGalleryImage>
       </b-row>
     </div>
+
+<!--    Load button to get more images-->
+    <b-row>
+      <b-col md="4" offset-md="4">
+        <b-button class="load-button" pill variant="outline-secondary" v-on:click="loadMoreImages">
+          Load More
+        </b-button>
+      </b-col>
+    </b-row>
+
   </div>
 
 </template>
@@ -35,9 +45,9 @@ export default {
   },
   data(){
     return{
-      editorLoaded: false,
-      selectedImageSrc: "",
-      src: ls.getImage(window.innerWidth,Math.round(window.innerWidth*0.7) )// Get Images based on viewport width and height
+      selectedImageSrc: "",  // ImageSource for Editor component
+      editorLoaded: false,  // Editor Ready state
+      loadedImages: this.nrOfImages
     }
   },
   computed:{
@@ -48,11 +58,21 @@ export default {
 
     // viewportHeight: property containing max allowed height, based on specified imageWhRatio property
     viewportHeight(){
-      return this.viewportWidth * this.imageWhRatio
+      return Math.round(this.viewportWidth * this.imageWhRatio) // Need rounding to avoid non-integer values
     },
-
+    currentLoadedImages(){
+      return this.sources.length
+    },
     sources(){
-      return new Array(this.nrOfImages).fill(ls.getImage(this.viewportWidth, this.viewportHeight))
+      // if no images loaded: create new array
+      let arr = new Array(this.loadedImages)
+        for (let i = 0; i < arr.length; i++) {
+          arr[i] = {
+            id: i,
+            url: ls.getImage(this.viewportWidth, this.viewportHeight)
+          };
+        }
+      return arr
     }
   },
   methods:{
@@ -60,6 +80,9 @@ export default {
       // console.log("Selecting Image with url: " + image)
       this.selectedImageSrc = image
       this.editorLoaded = true
+    },
+    loadMoreImages(){
+      this.loadedImages += 3
     }
   },
 }
@@ -72,11 +95,11 @@ export default {
   margin: 1em 0
 }
 
-  .col-md-4 {
+.editor-gallery-image{
     margin: 0.5em 0;
     /*flex: 0 0 33.333333%;*/
     /*max-width: 33.333%;*/
-  }
+}
 
 /* Enter and leave animations can use different */
 /* durations and timing functions.              */
@@ -91,4 +114,49 @@ export default {
   transform: translateX(10px);
   opacity: 10%
 }
+
+button{
+  width: 100%;
+  margin-bottom: 5rem;
+}
+
+.load-button{
+  background-color: transparent;
+  border-color: #0091AD;
+  color: #0091AD;
+}
+
+.load-button:hover{
+  transition: all 0.2s ease;
+  background-color: #0091AD;
+  border: #0091AD;
+  color:#FFFCFF;
+}
+.load-button:focus{
+  box-shadow: none !important;
+}
+
+/*.btn-secondary{*/
+/*  color: #0091AD;*/
+/*}*/
+
+/*button:hover{*/
+/*  background-color: #0091AD;*/
+/*  transition: background-color 0.1s ease;*/
+/*  border-color: #0091AD;*/
+/*}*/
+/*.btn-secondary:hover{*/
+/*  color: #FFFCFF;*/
+/*  transition: color 0.1s ease*/
+/*}*/
+
+/*button:visited{*/
+/*  background-color: transparent;*/
+/*  border-color: #0091AD;*/
+/*}*/
+
+/*.btn-secondary:visited{*/
+/*  color: #0091AD;*/
+/*}*/
+
 </style>

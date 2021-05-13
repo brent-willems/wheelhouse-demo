@@ -81,15 +81,20 @@ export default {
 img{
   max-width: 100%;
   max-height: 18rem;  /*Limit height to ensure*/
+  border: 4px solid transparent;
 }
 
+img:hover:not(.selectedImg){
+  border: 4px solid #77867F;
+  transition: border ease-in 150ms;
+}
 .spinner-grow{
   color: #0091AD;
 }
 
 .selectedImg{
   border: 4px solid #0091AD;
-  transition: border ease-in 100ms;
+  transition: border ease-in 150ms;
 }
 
 
