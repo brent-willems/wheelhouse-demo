@@ -43,43 +43,13 @@ export function getImage(width, height, seed, modifiers) {
             url = url + e + "&"
         })
     }
-
     return url
-
-
-    // DEPRECATED:
-    //  Async HTTP GET functionality moved to EditorGalleryImage itself
-
-    // let resUrl = ""
-
-    // HTTP Get request to fetch image with the desired parameters
-    // XHTTP based:
-    //  Synchronous atm for ease of development
-    //  TODO: Make async, provide function with callback to fetch resolved URL upon http GET completion
-    // let xhttp = new XMLHttpRequest();
-    // xhttp.onreadystatechange = function () {
-    //     if (this.readyState === 4 && this.status === 200) {
-    //         resUrl = this.responseURL
-    //     }
-    // };
-    // xhttp.open("GET", url, false);
-    // xhttp.send();
-
-
-    // Axios based HTTP
-    //  Uses Promises, TODO: look into using this if possible --> needs workaround for resolving Promises
-    // await axios.default.get(url)
-    //     .then((response) => {
-    //         //console.log(response.config.url)
-    //         //console.log("Response url: "+ response.request.responseURL)
-    //         resUrl =  response.request.responseURL
-    //     })
-    //
-    // console.log(resUrl)
-    //
-    // return resUrl;
-
-    // DEV: Display the completed URL
-    //console.log(xhttp.responseURL)
-    //return resUrl;
 }
+
+// Code to map a LoremPicsum full URL to its unique ID
+//  format of LormemPicsum response URL: https://i.picsum.photos/id/ ID / WIDTH / HEIGHT .jpg ?OTHER_DATA
+export function toId(fullUrl) {
+    let baseUrl = "https://i.picsum.photos/id/" // Base loremPicsum ID url
+    return fullUrl.substr(baseUrl.length).split("/")[0]  // Remove the baseUrl, then split the url and get the first part, namely the unique LoremPicsum ID
+}
+
