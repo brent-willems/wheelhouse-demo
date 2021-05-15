@@ -1,7 +1,7 @@
 <template>
   <div>
     <transition name="slide-fade">
-      <EditorTool  v-if="editorLoaded" :src="selectedImageSrc"></EditorTool>
+      <EditorTool  v-if="editorLoaded" :src="selectedImageSrc" :img-data="selectedImageData" :origWidth="viewportWidth" :origHeight="viewportHeight"></EditorTool>
     </transition>
 
     <div>
@@ -46,6 +46,7 @@ export default {
   data(){
     return{
       selectedImageSrc: "",  // ImageSource for Editor component
+      selectedImageData: null,
       editorLoaded: false,  // Editor Ready state
       loadedImages: this.nrOfImages
     }
@@ -78,7 +79,8 @@ export default {
   methods:{
     selectImage(image){
       // console.log("Selecting Image with url: " + image)
-      this.selectedImageSrc = image
+      this.selectedImageSrc = image.url
+      this.selectedImageData = image.data
       this.editorLoaded = true
     },
     loadMoreImages(){

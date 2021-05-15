@@ -21,7 +21,10 @@ async function load(src) {
   const config = { url: src, method: "get", responseType: "blob" }
   const response = await axios.request(config)
   //return response.data // the blob
-  return response.request.responseURL; // get the ResponseUrl
+  return {// get the ResponseUrl
+    respUrl: response.request.responseURL,
+    data: response.data
+  };
 }
 /**
  * Loads the image dynamically (asynchronously)
@@ -40,6 +43,7 @@ export default {
   data() {
     return {
       resUrl: "",
+      rawData: null,
       style: "",
     }
   },
@@ -50,7 +54,7 @@ export default {
   },
   methods: {
     onClickImage(){
-      this.$emit('select', this.resUrl)
+      this.$emit('select', {url: this.resUrl, data: this.rawData})
     },
     loaded() {
       // this.onClickImage = function(){
@@ -69,7 +73,8 @@ export default {
         // })
         load(src).then(result => {
           //console.log("Responseurl = " + result)
-          this.resUrl = result; // pass ResultUrl to image src attribute
+          this.resUrl = result.respUrl; // pass ResultUrl to image src attribute
+          this.rawData = result.data;
         })
       },
     },
@@ -96,6 +101,4 @@ img:hover:not(.selectedImg){
   border: 4px solid #0091AD;
   transition: border ease-in 150ms;
 }
-
-
 </style>
