@@ -3,36 +3,41 @@
     <h2>EditorTool</h2>
     <b-overlay :show="!imageReady">
       <b-row class="image-row">
-        <b-col class="image-col" align-self="center" md="6">
+        <b-col class="image-col" align-self="center" lg="7">
           <img class="disabled" v-if="imageReady" :src="currentSrc">
         </b-col>
-        <b-col md="6">
+        <b-col lg="5">
           <b-row class="editor-row" align-v="center">
-            <b-col md="5">
+            <b-col lg="5">
               <p>Width</p>
               <b-form-input v-model="width" type="range" min="1" :max="origWidth" ></b-form-input>
               <div class="mt-2">{{widthPercentage}}% ({{width}} px)</div>
             </b-col>
 
-            <b-col md="5">
+            <b-col lg="5">
               <p>Height</p>
               <b-form-input v-model="height" type="range" min="1" :max="origHeight"></b-form-input>
               <div class="mt-2">{{heightPercentage}}% ({{height}} px)</div>
             </b-col>
 
-            <b-col md="2">
+            <b-col lg="2">
               <b-button class="load-button" pill @click="resizeImage">Resize</b-button>
             </b-col>
           </b-row>
           <b-row align-v="center">
-            <b-col md="10">
+            <b-col lg="10">
               <p>Transparency</p>
               <b-form-input v-model="transparency" type="range" min="0" :max="100" ></b-form-input>
               <div class="mt-2">{{transparency}}%</div>
             </b-col>
 
-            <b-col md="2">
+            <b-col lg="2">
               <b-button class="load-button" pill @click="alpha">Alpha</b-button>
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col offset-lg="5" lg="2">
+              <b-button class="load-button" pill @click="downloadFile">Download</b-button>
             </b-col>
           </b-row>
         </b-col>
@@ -45,6 +50,7 @@
 <script>
 //import lipo from 'lipo'
 import axios from 'axios'
+import {saveAs} from 'file-saver'
 import * as ls from '@/assets/js/loremPicsum.js'
 import * as blob from '@/assets/js/blobConversion.js'
 
@@ -151,9 +157,9 @@ export default {
       })
     },
 
-    async alpha(){
+    async alpha() {
       await axios.get("http://localhost:3000/api/process/alpha", {
-        params:{
+        params: {
           id: this.imgId,
           alpha: this.transparency
         },
@@ -164,6 +170,9 @@ export default {
         // this.blobUrl = URL.createObjectURL(imageAsBlob)
         // this.currentSrc = this.blobUrl
       })
+    },
+    downloadFile(){
+       saveAs(this.blobUrl, String("edited-lorempicsum-" + this.imgId))
     }
 
   },
@@ -187,6 +196,14 @@ export default {
 </script>
 
 <style scoped>
+
+/* Custom styling for mobile devices*/
+@media(max-width: 992px) {
+  .col-lg-5{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
 .editor-tool{
   margin-bottom: 3rem;
 }
