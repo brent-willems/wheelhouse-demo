@@ -1,24 +1,33 @@
 <template>
   <div>
-    <transition name="slide-fade">
-      <EditorTool  v-if="editorLoaded" :src="selectedImageSrc" :img-data="selectedImageData" :origWidth="viewportWidth" :origHeight="viewportHeight"></EditorTool>
-    </transition>
-
-    <div>
-      <h1>Editor Gallery</h1>
-      <b-row>
-        <EditorGalleryImage  class="editor-gallery-image" :key="source.id" v-for="source in sources" :src="source.url" :selected-image="selectedImageSrc" @select="selectImage"></EditorGalleryImage>
-      </b-row>
-    </div>
-
-<!--    Load button to get more images-->
     <b-row>
-      <b-col md="4" offset-md="4">
-        <b-button class="load-button" pill variant="outline-secondary" v-on:click="loadMoreImages">
-          Load More
-        </b-button>
+      <b-col md="12">
+        <transition name="slide-fade">
+          <EditorTool  v-if="editorLoaded" :src="selectedImageSrc" :img-data="selectedImageData" :origWidth="viewportWidth" :origHeight="viewportHeight"></EditorTool>
+        </transition>
+      </b-col>
+
+      <b-col md="12">
+        <div>
+          <h1>Editor Gallery</h1>
+          <b-row>
+            <EditorGalleryImage  class="editor-gallery-image" :key="source.id" v-for="source in sources" :src="source.url" :selected-image="selectedImageSrc" @select="selectImage"></EditorGalleryImage>
+          </b-row>
+        </div>
+
+        <!--    Load button to get more images-->
+        <b-row>
+          <b-col md="4" offset-md="4">
+            <b-button class="load-button" pill variant="outline-secondary" v-on:click="loadMoreImages">
+              Load More
+            </b-button>
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
+
+
+
 
   </div>
 
@@ -123,42 +132,25 @@ button{
 }
 
 .load-button{
+  max-width: 100%;
+}
+
+/*Styling of buttons for gallery and child components*/
+
+/deep/ .load-button{
   background-color: transparent;
   border-color: #0091AD;
   color: #0091AD;
 }
 
-.load-button:hover{
+
+/deep/ .load-button:hover{
   transition: all 0.2s ease;
   background-color: #0091AD;
   border: #0091AD;
   color:#FFFCFF;
 }
-.load-button:focus{
+/deep/ .load-button:focus{
   box-shadow: none !important;
 }
-
-/*.btn-secondary{*/
-/*  color: #0091AD;*/
-/*}*/
-
-/*button:hover{*/
-/*  background-color: #0091AD;*/
-/*  transition: background-color 0.1s ease;*/
-/*  border-color: #0091AD;*/
-/*}*/
-/*.btn-secondary:hover{*/
-/*  color: #FFFCFF;*/
-/*  transition: color 0.1s ease*/
-/*}*/
-
-/*button:visited{*/
-/*  background-color: transparent;*/
-/*  border-color: #0091AD;*/
-/*}*/
-
-/*.btn-secondary:visited{*/
-/*  color: #0091AD;*/
-/*}*/
-
 </style>

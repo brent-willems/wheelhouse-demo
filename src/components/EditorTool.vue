@@ -1,31 +1,43 @@
 <template>
   <div class="editor-tool">
     <h2>EditorTool</h2>
-    <b-row>
-      <b-col md="6">
-        <img :src="currentSrc" @load="revokeBlob">
-      </b-col>
-      <b-col md="6">
-        <b-row>
-          <b-col md="6">
-            <p>Width</p>
-            <b-form-input v-model="width" type="range" min="1" :max="origWidth" ></b-form-input>
-            <div class="mt-2">{{widthPercentage}}% ({{width}} px)</div>
-          </b-col>
+    <b-overlay :show="!imageReady">
+      <b-row class="image-row">
+        <b-col class="image-col" align-self="center" md="6">
+          <img class="disabled" v-if="imageReady" :src="currentSrc">
+        </b-col>
+        <b-col md="6">
+          <b-row class="editor-row" align-v="center">
+            <b-col md="5">
+              <p>Width</p>
+              <b-form-input v-model="width" type="range" min="1" :max="origWidth" ></b-form-input>
+              <div class="mt-2">{{widthPercentage}}% ({{width}} px)</div>
+            </b-col>
 
-          <b-col md="6">
-            <p>Height</p>
-            <b-form-input v-model="height" type="range" min="1" :max="origHeight"></b-form-input>
-            <div class="mt-2">{{heightPercentage}}% ({{height}} px)</div>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-button class="load-button" pill variant="outline-secondary" @click="getEditedData">Crop Img</b-button>
-        </b-row>
-        <b-button @click="uploadImg">Upload</b-button>
-      </b-col>
-    </b-row>
+            <b-col md="5">
+              <p>Height</p>
+              <b-form-input v-model="height" type="range" min="1" :max="origHeight"></b-form-input>
+              <div class="mt-2">{{heightPercentage}}% ({{height}} px)</div>
+            </b-col>
 
+            <b-col md="2">
+              <b-button class="load-button" pill @click="resizeImage">Resize</b-button>
+            </b-col>
+          </b-row>
+          <b-row align-v="center">
+            <b-col md="10">
+              <p>Transparency</p>
+              <b-form-input v-model="transparency" type="range" min="0" :max="100" ></b-form-input>
+              <div class="mt-2">{{transparency}}%</div>
+            </b-col>
+
+            <b-col md="2">
+              <b-button class="load-button" pill @click="alpha">Alpha</b-button>
+            </b-col>
+          </b-row>
+        </b-col>
+      </b-row>
+    </b-overlay>
 
   </div>
 </template>
@@ -53,9 +65,14 @@ export default {
       currentSrc: this.src,
       bufferData: null,
 
+      // Image ready for edit (uploaded to server)
+      imageReady: false,
+
       // Form input data
       width: this.origWidth,
-      height: this.origHeight
+      height: this.origHeight,
+
+      transparency: 100
     }
   },
   computed:{
@@ -75,10 +92,27 @@ export default {
   },
   methods: {
 
-    // Revokes BlobURL when processed IMG is loaded
-    revokeBlob(){
-      if(this.blobUrl) URL.revokeObjectURL(this.blobUrl)
+    // UpdateImg
+    updateImg(bufferedImg, imgType){
+      // Revokes old blob
+      if(this.blobUrl) {
+        URL.revokeObjectURL(this.blobUrl)
+        // console.log("BlobUrl revoked")
+      }
+
+      let imageAsBlob = blob.b64toBlob(bufferedImg, imgType)
+      this.blobUrl = URL.createObjectURL(imageAsBlob)
+      this.currentSrc = this.blobUrl
+
     },
+    // Revokes BlobURL when processed IMG is loaded
+    // revokeBlob(){
+    //   // console.log("BlobUrl = " + this.blobUrl)
+    //   if(this.blobUrl) {
+    //     URL.revokeObjectURL(this.blobUrl)
+    //     // console.log("BlobUrl revoked")
+    //   }
+    // },
 
     // Upload image to Sharp server:
     //  based on https://stackoverflow.com/questions/47809402/post-image-which-store-as-a-blob-with-axios-vuejs
@@ -93,12 +127,16 @@ export default {
       await axios.post(URL, formData,{
         headers:{
           'Content-Type' : 'multipart/form-data'
-        }}).then(response => {console.log('response', response)}) // DEV: log response
+        }}).then(() => {
+        setTimeout(()=>{this.imageReady = true}, 250)
+      }) // DEV: log response
     },
 
+    //-- Image Processing functionality --//
 
-    async getEditedData(){
-      await axios.get("http://localhost:3000/api/process", {
+    // Resize Image
+    async resizeImage(){
+      await axios.get("http://localhost:3000/api/process/resize", {
         params:{
           id: this.imgId,
           width: this.width,
@@ -106,9 +144,25 @@ export default {
         },
         responseType: 'json'
       }).then((response) => {
-        console.log("RESPONSE IS: " + response.data.b64data)
-        let imageAsBlob = blob.b64toBlob(response.data.b64data, 'image/jpg')
-        this.currentSrc = URL.createObjectURL(imageAsBlob)
+        this.updateImg(response.data.b64data, response.data.contentType)
+        // let imageAsBlob = blob.b64toBlob(response.data.b64data, response.data.contentType)
+        // this.blobUrl = URL.createObjectURL(imageAsBlob)
+        // this.currentSrc = this.blobUrl
+      })
+    },
+
+    async alpha(){
+      await axios.get("http://localhost:3000/api/process/alpha", {
+        params:{
+          id: this.imgId,
+          alpha: this.transparency
+        },
+        responseType: 'json'
+      }).then((response) => {
+        this.updateImg(response.data.b64data, response.data.contentType)
+        // let imageAsBlob = blob.b64toBlob(response.data.b64data, response.data.contentType)
+        // this.blobUrl = URL.createObjectURL(imageAsBlob)
+        // this.currentSrc = this.blobUrl
       })
     }
 
@@ -118,8 +172,14 @@ export default {
     src: {
       immediate: true,
       handler(src) {
-        if (!src) return
-        this.currentSrc = src
+        if (!src) {
+          return
+        } else {
+          this.imageReady = false
+          this.currentSrc = src
+          this.uploadImg()
+        }
+
       },
     },
   }
@@ -130,7 +190,23 @@ export default {
 .editor-tool{
   margin-bottom: 3rem;
 }
+
+.editor-row{
+  margin-top:1.25rem;
+}
+
+.image-col{
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 img{
   max-width: 100%;
+  max-height: 23rem;
+}
+
+.row{
+  margin-bottom: 2rem;
 }
 </style>
